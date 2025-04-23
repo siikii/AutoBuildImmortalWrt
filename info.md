@@ -1,4 +1,4 @@
-### Pre installed packages
+### Pre-installed packages
 
 - luci-i18n-ttyd-zh-cn 
 - luci-theme-argon
@@ -12,6 +12,6 @@
 
 IP Address: `192.168.1.1`
 
-Username: `root` Password: no
+Username: `root` Password: `none`
 
 rootfs size: 2 GB
