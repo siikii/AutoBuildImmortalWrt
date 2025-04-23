@@ -23,7 +23,7 @@ jobs:
             -v "${{ github.workspace }}/rockchip/imm.config:/home/build/immortalwrt/.config" \
             -v "${{ github.workspace }}/rockchip/build.sh:/home/build/immortalwrt/build.sh" \
             -e PROFILE=friendlyarm_nanopi-r4s \
-            -e ROOTFS_PARTSIZE=2048 \
+            -e ROOTFS_PARTSIZE=1024 \
             -e ENABLE_PPPOE=no \
             -e PPPOE_ACCOUNT= \
             -e PPPOE_PASSWORD= \
