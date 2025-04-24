@@ -101,8 +101,8 @@ uci set dropbear.@dropbear[0].Interface=''
 uci commit
 
 # change packages sources to mirror
-sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immortalwrt,g' \
-    -e 's,https://mirrors.vsean.net/openwrt,https://mirrors.cernet.edu.cn/immortalwrt,g' \
+sed -e 's,https://downloads.immortalwrt.org,https://mirrors.sjtug.sjtu.edu.cn/immortalwrt,g' \
+    -e 's,https://mirrors.vsean.net/openwrt,https://mirrors.sjtug.sjtu.edu.cn/immortalwrt,g' \
     -i.bak /etc/opkg/distfeeds.conf
 
 # copyright info
