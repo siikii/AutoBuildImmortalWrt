@@ -14,4 +14,4 @@ IP Address: `192.168.1.1`
 
 Username: `root` Password: `none`
 
-rootfs size: 2 GB
+rootfs size: 1 GB

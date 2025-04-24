@@ -1,89 +1,90 @@
 #!/bin/sh
-# 99-custom.sh 就是immortalwrt固件首次启动时运行的脚本 位于固件内的/etc/uci-defaults/99-custom.sh
+# 99-custom.sh is the script that runs at ImmortalWrt's first boot. It is located in /etc/uci-defaults/99-custom.sh
 # Log file for debugging
 LOGFILE="/tmp/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >> $LOGFILE
-# 设置默认防火墙规则，方便虚拟机首次访问 WebUI
+
+# Setting firewall rules, so that user can access WebUI after first boot
 uci set firewall.@zone[1].input='ACCEPT'
 
-# 设置主机名映射，解决安卓原生 TV 无法联网的问题
+# Resolve time server IP address
 uci add dhcp domain
 uci set "dhcp.@domain[-1].name=time.android.com"
 uci set "dhcp.@domain[-1].ip=203.107.6.88"
 
-# 检查配置文件pppoe-settings是否存在 该文件由build.sh动态生成
+# Check if pppoe-settings exists. The file is created in the build.sh script.
 SETTINGS_FILE="/etc/config/pppoe-settings"
 if [ ! -f "$SETTINGS_FILE" ]; then
     echo "PPPoE settings file not found. Skipping." >> $LOGFILE
 else
-   # 读取pppoe信息($enable_pppoe、$pppoe_account、$pppoe_password)
+   # read pppoe info ($enable_pppoe、$pppoe_account、$pppoe_password)
    . "$SETTINGS_FILE"
 fi
 
-# 计算网卡数量
+# Count the number of physical network interfaces
 count=0
 ifnames=""
 for iface in /sys/class/net/*; do
   iface_name=$(basename "$iface")
-  # 检查是否为物理网卡（排除回环设备和无线设备）
+  # Check if the interface is a physical device
   if [ -e "$iface/device" ] && echo "$iface_name" | grep -Eq '^eth|^en'; then
     count=$((count + 1))
     ifnames="$ifnames $iface_name"
   fi
 done
-# 删除多余空格
+# remove leading whitespace
 ifnames=$(echo "$ifnames" | awk '{$1=$1};1')
 
-# 网络设置
+# Network configuration
 if [ "$count" -eq 1 ]; then
-   # 单网口设备 类似于NAS模式 动态获取ip模式 具体ip地址取决于上一级路由器给它分配的ip 也方便后续你使用web页面设置旁路由
-   # 单网口设备 不支持修改ip 不要在此处修改ip 
+   # single port interface, use DHCP to obtain IP address
+   # do not set ip address
    uci set network.lan.proto='dhcp'
 elif [ "$count" -gt 1 ]; then
-   # 提取第一个接口作为WAN
+   # get first interface name as WAN
    wan_ifname=$(echo "$ifnames" | awk '{print $1}')
-   # 剩余接口保留给LAN
+   # get remaining interface names as LAN
    lan_ifnames=$(echo "$ifnames" | cut -d ' ' -f2-)
-   # 设置WAN接口基础配置
+   # setting WAN interface
    uci set network.wan=interface
-   # 提取第一个接口作为WAN
+   # setting WAN interface name
    uci set network.wan.device="$wan_ifname"
-   # WAN接口默认DHCP
+   # setting WAN interface DHCP as default
    uci set network.wan.proto='dhcp'
-   # 设置WAN6绑定网口eth0
+   # binding WAN6 interface to eth0
    uci set network.wan6=interface
    uci set network.wan6.device="$wan_ifname"
-   # 更新LAN接口成员
-   # 查找对应设备的section名称
+   # Update LAN interfaces
+   # find devices section name
    section=$(uci show network | awk -F '[.=]' '/\.@?device\[\d+\]\.name=.br-lan.$/ {print $2; exit}')
    if [ -z "$section" ]; then
-      echo "error：cannot find device 'br-lan'." >> $LOGFILE
+      echo "error: cannot find device 'br-lan'." >> $LOGFILE
    else
-      # 删除原来的ports列表
+      # delete original ports list
       uci -q delete "network.$section.ports"
-      # 添加新的ports列表
+      # add new ports
       for port in $lan_ifnames; do
          uci add_list "network.$section.ports"="$port"
       done
       echo "ports of device 'br-lan' are update." >> $LOGFILE
    fi
-   # LAN口设置静态IP
+   # Set static IP address for the LAN interface
    uci set network.lan.proto='static'
-   # 多网口设备 支持修改为别的ip地址
+   # for multiple interfaces, possible to set other IP address
    uci set network.lan.ipaddr='192.168.1.1'
    uci set network.lan.netmask='255.255.255.0'
    echo "set 192.168.1.1 at $(date)" >> $LOGFILE
-   # 判断是否启用 PPPoE
+   # check if PPPoE enabled
    echo "print enable_pppoe value=== $enable_pppoe" >> $LOGFILE
    if [ "$enable_pppoe" = "yes" ]; then
       echo "PPPoE is enabled at $(date)" >> $LOGFILE
-      # 设置ipv4宽带拨号信息
+      # set IPv4 PPPoE configuration
       uci set network.wan.proto='pppoe'
       uci set network.wan.username=$pppoe_account
       uci set network.wan.password=$pppoe_password
       uci set network.wan.peerdns='1'
       uci set network.wan.auto='1'
-      # 设置ipv6 默认不配置协议
+      # ipv6 not configured by default
       uci set network.wan6.proto='none'
       echo "PPPoE configuration completed successfully." >> $LOGFILE
    else
@@ -92,14 +93,14 @@ elif [ "$count" -gt 1 ]; then
 fi
 
 
-# 设置所有网口可访问网页终端
+# set all interfaces can access web terminal
 uci delete ttyd.@ttyd[0].interface
 
-# 设置所有网口可连接 SSH
+# set all interfaces can acccess SSH
 uci set dropbear.@dropbear[0].Interface=''
 uci commit
 
-# 设置编译作者信息
+# copyright info
 FILE_PATH="/etc/openwrt_release"
 NEW_DESCRIPTION="Compiled by Jason Ding"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
