@@ -100,6 +100,11 @@ uci delete ttyd.@ttyd[0].interface
 uci set dropbear.@dropbear[0].Interface=''
 uci commit
 
+# change packages sources to mirror
+sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immortalwrt,g' \
+    -e 's,https://mirrors.vsean.net/openwrt,https://mirrors.cernet.edu.cn/immortalwrt,g' \
+    -i.bak /etc/opkg/distfeeds.conf
+
 # copyright info
 FILE_PATH="/etc/openwrt_release"
 NEW_DESCRIPTION="Compiled by Jason Ding"
