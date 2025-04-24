@@ -1,0 +1,47 @@
+name: build-RaspBerryPi4-24.10.1
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: |
+          chmod +x ${{ github.workspace }}/raspberrypi/build.sh
+
+      - name: Build raspberrypi ImmortalWrt 24.10.1
+        run: |
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+              -v "${{ github.workspace }}/raspberrypi/build.sh:/home/build/openwrt/build.sh" \
+              -e PROFILE=rpi-4 \
+              -e ROOTSIZE=2048 \
+              immortalwrt/imagebuilder:$tag /bin/bash /home/build/openwrt/build.sh
+      
+      - name: Generate Firmware SHA-256
+        run: |
+          cp ${{ github.workspace }}/bin/targets/bcm27xx/bcm2711/*squashfs-factory.img.gz  ${{ github.workspace }}
+          for file in *squashfs-factory.img.gz; do
+            sha256sum "$file" > "$file.sha256"
+            sha256sum -c "$file.sha256"
+          done
+      
+      - name: Upload ImmortalWrt as release assets
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          tag_name: Autobuild-raspberrypi
+          body_path: ${{ github.workspace }}/info.md
+          files: |
+            ${{ github.workspace }}/*.img.gz
+            ${{ github.workspace }}/*.sha256
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
