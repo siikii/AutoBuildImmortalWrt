@@ -13,15 +13,15 @@ https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/aarch64_
 
 https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/x86_64/luci/ 
 
-## Important Notes for Secondary Router Users
+## Notes for Secondary Router Users
 
-Recently many users mistakenly modify the default IP address in configuration files, thinking this workflow can directly set a secondary router IP. This is a big misunderstanding and will cause issues.
+Many users modify the default IP address in configuration files, thinking this workflow can directly set a secondary router IP. This is a big misunderstanding and will cause issues.
 
 The correct logic for a secondary router should be single-port mode. As shown in the firmware properties below, single-port mode defaults to `DHCP mode`. Users should check the IP assigned to the immortalWrt router from their main router.
 
 Then access the immortalWrt admin page using that IP, and configure the secondary router IP according to the main router's subnet.
 
-## Important Notes for Normal Router Mode
+## Notes for Normal Router Mode
 
 Normal router mode refers to multi-port users (2 or more ports).
 
