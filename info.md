@@ -8,6 +8,7 @@
 - `fdisk` A menu-driven program for creation and manipulation of partition tables
 - `luci-i18n-filebrowser-go-zh-cn` Filebrowser provides a file managing interface within a specified directory…
 - `openssh-sftp-server` OpenSSH SFTP server.
+- `luci-i18n-vnstat2-zh-cn` vnStat is a network traffic monitor for Linux that keeps a log of daily…
 
 ### Basic info
 
