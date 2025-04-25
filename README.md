@@ -7,7 +7,7 @@ It is a workflow for quickly building immortalWrt with docker support and custom
 > 2. Pre-installed docker (optional) 
 > 3. Supports QEMU-ARMv8 and rockchip platforms
 
-## How to check available plugins?
+## How to check available modules/packages?
 
 https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/aarch64_cortex-a53/luci/ 
 
