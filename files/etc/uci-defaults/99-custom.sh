@@ -71,9 +71,9 @@ elif [ "$count" -gt 1 ]; then
    # Set static IP address for the LAN interface
    uci set network.lan.proto='static'
    # for multiple interfaces, possible to set other IP address
-   uci set network.lan.ipaddr='192.168.1.1'
+   uci set network.lan.ipaddr='192.168.1.101'
    uci set network.lan.netmask='255.255.255.0'
-   echo "set 192.168.1.1 at $(date)" >> $LOGFILE
+   echo "set 192.168.1.101 at $(date)" >> $LOGFILE
    # check if PPPoE enabled
    echo "print enable_pppoe value=== $enable_pppoe" >> $LOGFILE
    if [ "$enable_pppoe" = "yes" ]; then

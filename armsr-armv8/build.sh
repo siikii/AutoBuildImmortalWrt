@@ -12,7 +12,7 @@ echo "Building for ROOTFS_PARTSIZE: $ROOTFS_PARTSIZE"
 echo "Create pppoe-settings"
 mkdir -p  /home/build/immortalwrt/files/etc/config
 
-# 创建pppoe配置文件 yml传入环境变量ENABLE_PPPOE等 写入配置文件 供99-custom.sh读取
+# create pppoe-settings file with environment variables set in yml file for 99-custom.sh to read
 cat << EOF > /home/build/immortalwrt/files/etc/config/pppoe-settings
 enable_pppoe=${ENABLE_PPPOE}
 pppoe_account=${PPPOE_ACCOUNT}
