@@ -2,15 +2,17 @@
 # Log file for debugging
 LOGFILE="/tmp/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >> $LOGFILE
-# yml 传入的路由器型号 PROFILE
+# show PROFILE defined in yml
 echo "Building for profile: $PROFILE"
-# yml 传入的固件大小 ROOTFS_PARTSIZE
+# show ROOTFS_PARTSIZE defined in yml
 echo "Building for ROOTFS_PARTSIZE: $ROOTFS_PARTSIZE"
 
+# uncomment the following section if you want to set PPPoE settings
+: <<'END_COMMENT'
 echo "Create pppoe-settings"
 mkdir -p  /home/build/immortalwrt/files/etc/config
 
-# 创建pppoe配置文件 yml传入环境变量ENABLE_PPPOE等 写入配置文件 供99-custom.sh读取
+# create pppoe-settings file with environment variables set in yml file for 99-custom.sh to read
 cat << EOF > /home/build/immortalwrt/files/etc/config/pppoe-settings
 enable_pppoe=${ENABLE_PPPOE}
 pppoe_account=${PPPOE_ACCOUNT}
@@ -19,13 +21,13 @@ EOF
 
 echo "cat pppoe-settings"
 cat /home/build/immortalwrt/files/etc/config/pppoe-settings
+END_COMMENT
 
-
-# 输出调试信息
+# show debug info
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting build process..."
 
 
-# 定义所需安装的包列表 23.05.4 下列插件你都可以自行删减
+# define the list of packages to be installed, add or remove packages as needed
 PACKAGES=""
 PACKAGES="$PACKAGES curl"
 PACKAGES="$PACKAGES luci-i18n-diskman-zh-cn"
@@ -36,16 +38,17 @@ PACKAGES="$PACKAGES luci-app-argon-config"
 PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
-PACKAGES="$PACKAGES luci-app-openclash"
-PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
+# PACKAGES="$PACKAGES luci-app-openclash"
+# PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
-PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
-# 增加几个必备组件 方便用户安装iStore
-PACKAGES="$PACKAGES fdisk"
-PACKAGES="$PACKAGES script-utils"
-PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-vnstat2-zh-cn"
+# PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
+# some required components if you want to install iStore
+# PACKAGES="$PACKAGES fdisk"
+# PACKAGES="$PACKAGES script-utils"
+# PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 
-# 构建镜像
+# build the image
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
 echo "$PACKAGES"
 
