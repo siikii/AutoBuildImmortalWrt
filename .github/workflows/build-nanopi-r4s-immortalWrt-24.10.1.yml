@@ -40,7 +40,7 @@ jobs:
       - name: Upload Firmware
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild
+          tag_name: FriendlyARM_NanoPi
           name: ImmortWrt-NanoPi-R4S
           body_path: ${{ github.workspace }}/info.md
           files: |
